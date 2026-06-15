@@ -1,0 +1,102 @@
+# Workflow Progress
+
+## Week 1: Foundation, data validation, and baseline ML
+- [x] Python package with src/ layout
+- [x] Config loader
+  - [x] configs/default.yaml
+  - [x] src/genomics_ml/utils/config.py
+- [x] Logger
+  - [x] src/genomics_ml/utils/logging.py
+- [x] Dataset loader
+  - [x] src/genomics_ml/data/load_data.py
+- [x] Validation checks
+  - [x] src/genomics_ml/data/validation.py
+- [x] Preprocessing functions
+  - [x] src/genomics_ml/features/preprocessing.py
+- [x] Baseline scikit-learn model
+  - [x] src/genomics_ml/models/train.py
+- [x] Training script
+  - [x] scripts/train_model.py
+- [x] Saved model artifact
+- [x] Tests
+  - [x] tests/test_config.py
+  - [x] tests/test_preprocessing.py
+  - [x] tests/test_training.py
+- [x] README
+- [x] Definition of done
+  - [x] make install
+  - [x] make test       (10 passed)
+  - [x] make train      (accuracy 0.92)
+  - [x] make smoke-test (passed)
+
+## Week 2: Experiment tracking, SQL-powered ML workflow, and API serving
+- [x] MLflow tracking
+- [x] SQLite database with schema
+  - [x] sql/create_tables.sql
+  - [x] sql/model_run_summary.sql
+- [x] SQL data retrieval — queries to extract training datasets from the database
+  - [x] sql/data_retrieval.sql
+- [x] SQL feature engineering — derive new features using CASE WHEN, aggregations, window functions
+  - [x] sql/feature_engineering.sql
+- [x] SQL model evaluation — query prediction tables to compute accuracy, precision, recall
+  - [x] sql/queries_for_evaluation.sql
+- [x] SQL deployment & integration — store/retrieve predictions and model metadata via SQL
+  - [x] sql/prediction_queries.sql
+- [x] Model comparison
+  - [x] src/genomics_ml/models/predict.py
+- [x] FastAPI service
+  - [x] src/genomics_ml/api/main.py
+  - [x] examples/predict_example.json
+- [x] Pydantic request and response models
+- [x] API tests
+  - [x] tests/test_api.py
+- [x] API documentation
+  - [x] docs/api.md
+  - [x] docs/modeling.md
+- Endpoints
+  - [x] GET /health
+  - [x] GET /model-info
+  - [x] POST /predict
+- Definition of done
+  - [x] make train
+  - [x] make evaluate
+  - [x] make serve
+  - [x] pytest tests/  (13 passed, 2 pre-existing failures)
+
+## Week 3: Docker, CI/CD, and orchestration
+- [x] Dockerfile
+  - [x] Dockerfile
+  - [x] .dockerignore
+- [x] Docker Compose
+  - [x] docker-compose.yml (created as compose.yaml)
+- [x] GitHub Actions CI
+  - [x] .github/workflows/ci.yml
+- [ ] Prefect flow
+  - [ ] src/genomics_ml/orchestration/prefect_flow.py
+  - [ ] scripts/run_pipeline.py
+- [ ] Basic model promotion logic
+- [ ] Orchestration tests
+  - [ ] tests/test_pipeline.py
+- [ ] Docker and CI documentation
+  - [ ] docs/docker.md
+  - [ ] docs/ci-cd.md
+  - [ ] docs/orchestration.md
+- Definition of done
+  - [ ] docker build -t genomics-ml-api .
+  - [ ] docker compose up
+  - [ ] make test
+  - [ ] make run-pipeline
+
+## Week 4: Cloud basics and final portfolio packaging
+- [ ] Local/cloud storage config option
+- [ ] Cloud artifact storage documentation
+  - [ ] docs/cloud-deployment.md
+- [ ] Optional container deployment documentation
+- [ ] Final README
+  - [ ] README.md
+- [ ] Architecture diagram
+- [ ] Case study
+  - [ ] docs/case-study.md
+- [ ] Operations notes
+  - [ ] docs/operations.md
+- [ ] Final CV bullet

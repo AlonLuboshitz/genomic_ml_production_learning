@@ -1,0 +1,30 @@
+
+
+services:
+  # Our single service — the FastAPI prediction API
+  api:
+    # Build from the Dockerfile in the current directory
+    build: .
+
+    # Map port: host:container
+    # Access the API at http://localhost:8000
+    ports:
+      - "8000:8000"
+
+    # Mount local directories so data/model changes persist
+    # Format: ./host-path:/container-path
+    volumes:
+      # Mount the trained model so the API can load it
+      - ./models:/app/models
+      # Mount SQLite DB so predictions persist across restarts
+      - ./ml_metadata.db:/app/ml_metadata.db
+
+    # Environment variables available inside the container
+    environment:
+      - ENVIRONMENT=development
+
+    # Override the Dockerfile's CMD (optional)
+    # --reload enables hot-reload during development
+    command: >
+      uvicorn genomics_ml.api.main:app
+      --host 0.0.0.0 --port 8000 --reload

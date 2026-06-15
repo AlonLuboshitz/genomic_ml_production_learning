@@ -1,0 +1,26 @@
+# Python cache files — unnecessary bloat
+__pycache__/
+*.pyc
+
+# Virtual environment — would be huge; we install fresh inside
+.venv/
+venv/
+
+# Environment config — don't leak secrets
+.env
+
+# SQLite database — we want a fresh one or a mounted volume
+*.db
+
+# MLflow experiment data — too large, should be mounted or stored remotely
+mlruns/
+
+# Trained models — should be mounted or fetched at runtime
+models/
+
+# Git history — not needed in the container
+.git/
+
+# OS files
+.DS_Store
+Thumbs.db

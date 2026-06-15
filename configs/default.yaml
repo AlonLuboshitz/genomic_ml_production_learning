@@ -1,0 +1,30 @@
+# Default configuration for the genomics ML pipeline
+
+data:
+  raw_path: "data/raw/genomics_data.csv"
+  processed_path: "data/processed/genomics_data_clean.csv"
+  test_size: 0.2
+  random_state: 42
+
+preprocessing:
+  scaler: "standard"  # standard, minmax, robust
+  impute_strategy: "mean"
+
+model:
+  type: "RandomForestClassifier"
+  path: "models/baseline.pkl"
+  params:
+    n_estimators: 100
+    max_depth: 10
+    random_state: 42
+
+validation:
+  schema: ~                  # e.g. {"gene_1": "float64", "gene_2": "float64", "target": "int64"}
+  max_missing_frac: 0.5      # max fraction of missing values per column
+  value_ranges: ~            # e.g. {"gene_1": [0.0, 100.0]}
+  min_class_frac: 0.05       # min fraction of samples per target class
+  check_duplicates: true
+
+logging:
+  level: "INFO"
+  file: "logs/pipeline.log"
