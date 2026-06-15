@@ -31,6 +31,7 @@ def init_database(db_path: str) -> sqlite3.Connection:
     connection.commit()
     return connection
 
+
 def insert_run(
     conn: sqlite3.Connection,
     model_name: str,
@@ -44,22 +45,31 @@ def insert_run(
     num_features: Optional[int] = None,
 ) -> int:
     """Insert a new run and return its ID."""
-    cursor = conn.execute("""
+    cursor = conn.execute(
+        """
         INSERT INTO runs
             (model_name, run_name, status, dataset_path,
              test_size, random_state, training_rows, testing_rows, num_features)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (model_name, run_name, status, dataset_path,
-         test_size, random_state, training_rows, testing_rows, num_features),)
+        (
+            model_name,
+            run_name,
+            status,
+            dataset_path,
+            test_size,
+            random_state,
+            training_rows,
+            testing_rows,
+            num_features,
+        ),
+    )
     last_id = cursor.lastrowid
     conn.commit()
     return last_id
 
 
-def insert_params(
-    conn: sqlite3.Connection, run_id: int, params: Dict[str, Any]
-):
+def insert_params(conn: sqlite3.Connection, run_id: int, params: Dict[str, Any]):
     """TODO: Insert model parameters as key-value pairs.
 
     Steps:
@@ -68,14 +78,15 @@ def insert_params(
       3. conn.commit()
     """
     # YOUR CODE HERE
-    for param_name,param_value in params.items():
-        conn.execute("INSERT INTO params (run_id, param_name, param_value) VALUES (?, ?, ?)",(run_id,param_name,str(param_value)))
+    for param_name, param_value in params.items():
+        conn.execute(
+            "INSERT INTO params (run_id, param_name, param_value) VALUES (?, ?, ?)",
+            (run_id, param_name, str(param_value)),
+        )
     conn.commit()
 
 
-def insert_metrics(
-    conn: sqlite3.Connection, run_id: int, metrics: Dict[str, float]
-):
+def insert_metrics(conn: sqlite3.Connection, run_id: int, metrics: Dict[str, float]):
     """TODO: Insert evaluation metrics.
 
     Steps:
@@ -85,8 +96,12 @@ def insert_metrics(
     """
     # YOUR CODE HERE
     for metric_name, metric_value in metrics.items():
-        conn.execute("INSERT INTO metrics (run_id, metric_name, metric_value) VALUES (?, ?, ?)",(run_id,metric_name,float(metric_value)))
+        conn.execute(
+            "INSERT INTO metrics (run_id, metric_name, metric_value) VALUES (?, ?, ?)",
+            (run_id, metric_name, float(metric_value)),
+        )
     conn.commit()
+
 
 def insert_predictions(
     conn: sqlite3.Connection,
@@ -112,17 +127,28 @@ def insert_predictions(
          (run_id, split, i, y_pred[i], y_true[i] or None, probabilities[i] or None)
       3. conn.commit()
     """
+    # Convert to lists for consistent indexing (handles pandas Series/DataFrame)
+    y_pred = list(y_pred)
+    if y_true is not None:
+        y_true = list(y_true)
+    if probabilities is not None:
+        probabilities = list(probabilities)
+
     for i in range(len(y_pred)):
         conn.execute(
             """INSERT INTO predictions
                    (run_id, split, row_index, prediction, actual, probability)
                VALUES (?, ?, ?, ?, ?, ?)""",
-            (run_id, split, i, int(y_pred[i]),
-             int(y_true[i]) if y_true else None,
-             float(probabilities[i]) if probabilities else None),
+            (
+                run_id,
+                split,
+                i,
+                int(y_pred[i]),
+                int(y_true[i]) if y_true is not None else None,
+                float(probabilities[i]) if probabilities is not None else None,
+            ),
         )
     conn.commit()
-
 
 
 def get_best_run(conn: sqlite3.Connection) -> Optional[Dict]:
@@ -157,7 +183,11 @@ def get_best_run(conn: sqlite3.Connection) -> Optional[Dict]:
         "accuracy": row[4],
     }
 
+
 def close_connection(conn, model_path, run_id):
-    conn.execute("UPDATE runs SET status = 'completed', model_path = ? WHERE id = ?", (model_path, run_id))
+    conn.execute(
+        "UPDATE runs SET status = 'completed', model_path = ? WHERE id = ?",
+        (model_path, run_id),
+    )
     conn.commit()
     conn.close()

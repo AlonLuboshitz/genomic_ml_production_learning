@@ -26,6 +26,7 @@ from importlib.metadata import version
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import numpy as np
+
 # Reuse central model utilities instead of calling joblib directly
 from genomics_ml.models.model_utils import (
     load_model,
@@ -57,9 +58,11 @@ except Exception as e:
     N_FEATURES = 0
     print(f"WARNING: Could not load model from {MODEL_PATH}: {e}")
 
+
 # ── Pydantic models ───────────────────────────────────────────────────
 class PredictRequest(BaseModel):
     """Input: a list of gene expression feature values."""
+
     features: list[float] = Field(
         ...,
         min_length=1,
@@ -70,18 +73,21 @@ class PredictRequest(BaseModel):
 
 class PredictResponse(BaseModel):
     """Output: predicted class label and confidence."""
+
     prediction: int = Field(..., description="Predicted class (0 or 1)")
     probability: float = Field(..., description="Confidence score for class 1")
 
 
 class ModelInfoResponse(BaseModel):
     """Metadata about the loaded model."""
+
     model_type: str
     n_features: int
     status: str
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────
+
 
 @app.get("/health")
 def health():
@@ -100,6 +106,7 @@ def model_info():
         status="loaded",
     )
 
+
 @app.post("/predict", response_model=PredictResponse)
 def predict_(req: PredictRequest):
     """Accept feature values, return a prediction and probability."""
@@ -116,8 +123,8 @@ def predict_(req: PredictRequest):
     try:
         # Convert input to numpy array (shape: 1 x n_features)
         X = np.array([req.features])
-        pred = predict(model, X)          # returns array like [0] or [1]
-        proba = predict_proba(model, X)   # returns array like [[p0, p1]]
+        pred = predict(model, X)  # returns array like [0] or [1]
+        proba = predict_proba(model, X)  # returns array like [[p0, p1]]
         return PredictResponse(
             prediction=int(pred[0]),
             probability=round(float(proba[0][1]), 4),

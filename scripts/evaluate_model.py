@@ -10,7 +10,6 @@ Usage:
 import argparse
 import sys
 
-import pandas as pd
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 
@@ -49,7 +48,7 @@ def main():
     logger.info("Test set: %d samples", len(X_test))
 
     # Predict and evaluate
-    y_pred = predict(model, X_test.values if hasattr(X_test, 'values') else X_test)
+    y_pred = predict(model, X_test.values if hasattr(X_test, "values") else X_test)
     report = classification_report(y_test, y_pred)
     print("\n=== Evaluation Report ===\n")
     print(report)

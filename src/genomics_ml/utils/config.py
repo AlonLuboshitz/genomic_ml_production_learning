@@ -50,4 +50,3 @@ def get_config_path(env_var: str = "GENOMICS_ML_CONFIG") -> str:
 
     # Fallback: assume running from project root
     return "configs/default.yaml"
-

@@ -23,8 +23,12 @@ def main():
     parser = argparse.ArgumentParser(description="Train baseline ML model")
     parser.add_argument("--config", default=None, help="Path to config YAML")
     parser.add_argument("--model-type", default=None, help="Override model type")
-    parser.add_argument("--model-params", default=None, help="Override model params as JSON")
-    parser.add_argument("--experiment-name", default=None, help="MLflow experiment name")
+    parser.add_argument(
+        "--model-params", default=None, help="Override model params as JSON"
+    )
+    parser.add_argument(
+        "--experiment-name", default=None, help="MLflow experiment name"
+    )
     parser.add_argument("--run-name", default=None, help="Specific run name")
     args = parser.parse_args()
 
@@ -42,7 +46,8 @@ def main():
     X, y = load_data(config_path=config_path)
 
     metrics, pipeline = train_model(
-        X, y,
+        X,
+        y,
         config=config,
         experiment_name=args.experiment_name,
         run_name=args.run_name,

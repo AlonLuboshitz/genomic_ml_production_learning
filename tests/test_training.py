@@ -29,7 +29,7 @@ def tiny_data():
 def minimal_config():
     """Return a minimal config dict for training (no YAML file needed)."""
     return {
-        "data": {"test_size": 0.3, "random_state": 42},
+        "data": {"test_size": 0.3, "random_state": 42, "raw_path": "data/raw"},
         "preprocessing": {"impute_strategy": "mean", "scaler": "standard"},
         "model": {
             "type": "RandomForestClassifier",
