@@ -7,13 +7,14 @@ instead of calling joblib or sklearn directly.
 
 import joblib
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 import numpy as np
 from sklearn.metrics import accuracy_score
 
 
 # ── Load / Save ───────────────────────────────────────────────────────
+
 
 def load_model(model_path: str) -> Any:
     """Load a fitted sklearn pipeline from disk."""
@@ -33,6 +34,7 @@ def save_model(pipeline: Any, model_path: str) -> str:
 
 # ── Introspection ─────────────────────────────────────────────────────
 
+
 def get_model_type(model: Any) -> str:
     """Extract the classifier class name from a Pipeline."""
     return type(model.named_steps["clf"]).__name__
@@ -46,6 +48,7 @@ def get_n_features(model: Any) -> int:
 
 
 # ── Prediction ────────────────────────────────────────────────────────
+
 
 def predict(model: Any, X: np.ndarray) -> np.ndarray:
     """Return predicted class labels."""
@@ -65,6 +68,7 @@ def predict_proba(model: Any, X: np.ndarray) -> np.ndarray:
 
 # ── Comparison ────────────────────────────────────────────────────────
 
+
 def compare_models(
     model_paths: List[str],
     X_test: np.ndarray,
@@ -76,10 +80,12 @@ def compare_models(
         model = load_model(path)
         y_pred = predict(model, X_test)
         acc = accuracy_score(y_test, y_pred)
-        results.append({
-            "model_path": path,
-            "model_type": get_model_type(model),
-            "accuracy": round(acc, 4),
-        })
+        results.append(
+            {
+                "model_path": path,
+                "model_type": get_model_type(model),
+                "accuracy": round(acc, 4),
+            }
+        )
     results.sort(key=lambda r: r["accuracy"], reverse=True)
     return results

@@ -15,8 +15,9 @@ venv/
 # MLflow experiment data — too large, should be mounted or stored remotely
 mlruns/
 
-# Trained models — should be mounted or fetched at runtime
+# Trained models — only include the baseline needed for the API
 models/
+!models/baseline.pkl
 
 # Git history — not needed in the container
 .git/

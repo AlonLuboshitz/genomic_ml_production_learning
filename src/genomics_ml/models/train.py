@@ -28,8 +28,6 @@ Run the training with:
 
 from typing import Any, Dict, Optional, Tuple
 
-import joblib
-import os
 import pandas as pd
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
@@ -41,7 +39,14 @@ from genomics_ml.models.model_utils import save_model
 import mlflow
 from genomics_ml.utils.config import load_config, get_config_path
 from genomics_ml.utils.logging import get_logger
-from genomics_ml.utils.database import *
+from genomics_ml.utils.database import (
+    close_connection,
+    init_database,
+    insert_metrics,
+    insert_params,
+    insert_predictions,
+    insert_run,
+)
 
 logger = get_logger("genomics_ml.models.train")
 
@@ -108,7 +113,9 @@ def train_model(
     )
     logger.info(
         "Split: train=%d, test=%d (test_size=%.2f)",
-        len(X_train), len(X_test), test_size,
+        len(X_train),
+        len(X_test),
+        test_size,
     )
 
     # ── Build pipeline ────────────────────────────────────────
@@ -135,6 +142,7 @@ def train_model(
         if model_path is None:
             model_type, _ = _get_model_configs(config)
             from datetime import datetime
+
             date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
             model_path = f"models/{model_type}_{date_str}.pkl"
 
@@ -145,15 +153,17 @@ def train_model(
     probabilities = pipeline.predict_proba(X_test)[:, 1]
 
     db_connection = init_database("ml_metadata.db")
-    run_id = insert_run(db_connection,
-            model_name=config["model"]["type"],
-            run_name=run_name or "unnamed",
-            dataset_path=config["data"]["raw_path"],
-            test_size=config["data"]["test_size"],
-            random_state=config["data"]["random_state"],
-            training_rows=len(X_train),
-            testing_rows=len(X_test),
-            num_features=X.shape[1])
+    run_id = insert_run(
+        db_connection,
+        model_name=config["model"]["type"],
+        run_name=run_name or "unnamed",
+        dataset_path=config["data"]["raw_path"],
+        test_size=config["data"]["test_size"],
+        random_state=config["data"]["random_state"],
+        training_rows=len(X_train),
+        testing_rows=len(X_test),
+        num_features=X.shape[1],
+    )
 
     insert_params(db_connection, run_id, config["model"]["params"])
     insert_metrics(db_connection, run_id, {"accuracy": accuracy})
