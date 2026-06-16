@@ -14,7 +14,7 @@ data/processed/*
 !data/processed/.gitkeep
 
 # Models
-models/
+/models/
 
 # Logs
 logs/
@@ -24,7 +24,7 @@ logs/
 
 # Reports
 reports/
-
+ci_failure.txt
 # Environment
 venv/
 .venv/
