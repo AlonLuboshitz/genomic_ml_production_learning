@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS runs (
     random_state    INTEGER NOT NULL DEFAULT 42,
     training_rows   INTEGER,
     testing_rows    INTEGER,
-    num_features    INTEGER
+    num_features    INTEGER,
+    is_champion     INTEGER NOT NULL DEFAULT 0
 );
 
 -- ── Params ──────────────────────────────────────────────────

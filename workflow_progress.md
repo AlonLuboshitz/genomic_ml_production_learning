@@ -71,24 +71,39 @@
   - [x] docker-compose.yml (created as compose.yaml)
 - [x] GitHub Actions CI
   - [x] .github/workflows/ci.yml
-- [ ] Prefect flow
-  - [ ] src/genomics_ml/orchestration/prefect_flow.py
-  - [ ] scripts/run_pipeline.py
-- [ ] Basic model promotion logic
-- [ ] Orchestration tests
-  - [ ] tests/test_pipeline.py
-- [ ] Docker and CI documentation
-  - [ ] docs/docker.md
-  - [ ] docs/ci-cd.md
-  - [ ] docs/orchestration.md
+- [x] Prefect flow
+  - [x] src/genomics_ml/orchestration/prefect_flow.py
+  - [x] scripts/run_pipeline.py
+- [x] Basic model promotion logic
+- [x] Orchestration tests
+  - [x] tests/test_pipeline.py
+- [x] Docker and CI documentation
+  - [x] docs/docker.md
+  - [x] docs/ci-cd.md
+  - [x] docs/orchestration.md
 - Definition of done
-  - [ ] docker build -t genomics-ml-api .
-  - [ ] docker compose up
-  - [ ] make test
-  - [ ] make run-pipeline
+  - [x] make test                  (21 passed)
+  - [x] make run-pipeline          (tested, accuracy 0.92)
+  - [ ] docker build -t genomics-ml-api .   (needs Docker on your machine)
+  - [ ] docker compose up                   (needs Docker on your machine)
 
 ## Week 4: Cloud basics and final portfolio packaging
-- [ ] Local/cloud storage config option
+- [x] Local/cloud storage config option
+  - [x] configs/default.yaml — add `storage.backend: "local" | "s3"` section
+  - [x] src/genomics_ml/utils/storage.py — new CloudStorage class (boto3 S3)
+- [ ] Terraform IaC configuration
+  - [ ] VPC (10.0.0.0/16) with 2 public subnets + 2 private subnets across 2 AZs
+  - [ ] Internet Gateway + public route table
+  - [ ] VPC Gateway Endpoint for S3 (private subnets → S3 without internet)
+  - [ ] Security Groups (app-tier SG port 8000, data-tier SG locked down)
+  - [ ] Network ACLs (stateless rules: public allow 8000, private deny inbound)
+  - [ ] S3 bucket (genomics-ml-artifacts) + IAM user with bucket policy
+  - [ ] terraform/main.tf              # all above resources
+  - [ ] terraform/variables.tf         # CIDRs, AZs, region, bucket, tags
+  - [ ] terraform/outputs.tf           # VPC/subnet/SG IDs, bucket name
+  - [ ] terraform/versions.tf          # terraform >= 1.3, aws >= 4.0
+- [ ] CI/CD for Terraform (plan on PR, apply on merge)
+  - [ ] .github/workflows/terraform-ci.yml
 - [ ] Cloud artifact storage documentation
   - [ ] docs/cloud-deployment.md
 - [ ] Optional container deployment documentation

@@ -39,7 +39,7 @@ def main():
     model = load_model(model_path)
 
     # Load data and split
-    X, y = load_data(config_path=config_path)
+    X, y = load_data(config=config)
     test_size = config.get("data", {}).get("test_size", 0.2)
     random_state = config.get("data", {}).get("random_state", 42)
     _, X_test, _, y_test = train_test_split(

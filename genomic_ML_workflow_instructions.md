@@ -281,6 +281,14 @@ tests/test_pipeline.py
 Help the user build:
 
 - local/cloud storage config option,
+- Terraform IaC configuration:
+  - VPC (`10.0.0.0/16`) with 2 public subnets (`10.0.1.0/24`, `10.0.2.0/24`) and 2 private subnets (`10.0.10.0/24`, `10.0.20.0/24`) across 2 AZs,
+  - Internet Gateway attached to VPC with public route table,
+  - VPC Gateway Endpoint for S3 (private subnets → S3 without internet),
+  - Security Groups (app-tier SG allowing port 8000, data-tier SG locked down),
+  - Network ACLs (stateless rules: public subnets allow inbound 8000+ephemeral; private subnets deny inbound from outside VPC),
+  - S3 bucket (`genomics-ml-artifacts`) + IAM user with bucket policy,
+- CI/CD for Terraform (plan on PR, apply on merge),
 - cloud artifact storage documentation,
 - optional simple container deployment documentation,
 - final README,
@@ -288,6 +296,15 @@ Help the user build:
 - case study,
 - operations notes,
 - final CV bullet.
+
+> **Future file changes (not yet implemented):**
+> - `configs/default.yaml` — add `storage.backend: "local" | "s3"` section to toggle between local and cloud artifact paths.
+> - `src/genomics_ml/utils/storage.py` — new file with `CloudStorage` class using `boto3.client("s3")` for `upload()`, `download()`, `list_objects()`. The S3 client works transparently through the VPC Gateway Endpoint when running inside the VPC, or over the internet when running locally.
+> - `terraform/main.tf` — all networking resources (VPC, subnets, IGW, VPC Endpoint, SGs, NACLs) plus S3 bucket and IAM.
+> - `terraform/variables.tf` — CIDRs, AZs, region, bucket name, tags.
+> - `terraform/outputs.tf` — VPC ID, subnet IDs, SG IDs, bucket name, endpoint ID.
+> - `terraform/versions.tf` — `terraform >= 1.3`, `aws >= 4.0`.
+> - No existing `.py` files need changes — networking is transparent to application code.
 
 Definition of done:
 
@@ -304,6 +321,12 @@ docs/cloud-deployment.md
 docs/operations.md
 docs/case-study.md
 README.md
+terraform/
+├── main.tf                    # VPC, subnets, IGW, VPC Endpoint, SGs, NACLs, S3 bucket, IAM
+├── variables.tf               # CIDRs, AZs, region, bucket name, tags
+├── outputs.tf                 # VPC ID, subnet IDs, SG IDs, bucket name
+├── versions.tf                # terraform >= 1.3, aws >= 4.0
+.github/workflows/terraform-ci.yml
 ```
 
 ## Preferred technology choices
@@ -323,6 +346,7 @@ Linting/formatting: ruff and black
 Containers: Docker and Docker Compose
 CI/CD: GitHub Actions
 Orchestration: Prefect first, Airflow optional
+IaC: Terraform (HCL)
 Cloud: AWS S3 or GCP Cloud Storage; Cloud Run/ECS/VM optional
 ```
 
@@ -455,7 +479,6 @@ For this 1-month project, avoid:
 - Terraform,
 - complex Airflow deployments,
 - distributed Spark,
-- advanced cloud networking,
 - production-grade authentication,
 - complex dashboards,
 - perfect model accuracy work,

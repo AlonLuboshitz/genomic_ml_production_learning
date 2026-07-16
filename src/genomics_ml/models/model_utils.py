@@ -3,32 +3,60 @@ Central model utilities — all model load/save/predict/introspection in one pla
 
 Both train.py, predict.py, and api/main.py should import from here
 instead of calling joblib or sklearn directly.
+
+Cloud storage support:
+    Pass a config dict to save_model/load_model to enable S3 sync.
+    Without config, behavior is identical to the original local-only version.
 """
 
-import joblib
-import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from sklearn.metrics import accuracy_score
-
+from genomics_ml.utils.storage import StorageManager
 
 # ── Load / Save ───────────────────────────────────────────────────────
 
 
-def load_model(model_path: str) -> Any:
-    """Load a fitted sklearn pipeline from disk."""
-    try:
-        model = joblib.load(model_path)
-    except Exception as e:
-        raise RuntimeError(f"Unable to load model from {model_path}: {e}")
+def load_model(model_path: str, config: Optional[dict] = None) -> Any:
+    """
+    Load a fitted sklearn pipeline from disk.
+
+    If config is provided with storage.backend == "s3", will attempt
+    to download from S3 if the local file doesn't exist.
+
+    Args:
+        model_path: Path to the saved model file.
+        config: Optional pipeline config dict for cloud storage.
+
+    Returns:
+        The deserialized model object.
+
+    Raises:
+        RuntimeError: If the model cannot be loaded.
+    """
+    storage_manager = StorageManager(config)
+    model = storage_manager.load(model_path)
     return model
 
 
-def save_model(pipeline: Any, model_path: str) -> str:
-    """Save a fitted pipeline to disk, creating directories if needed."""
-    os.makedirs(os.path.dirname(model_path) or ".", exist_ok=True)
-    joblib.dump(pipeline, model_path)
+def save_model(pipeline: Any, model_path: str, config: Optional[dict] = None) -> str:
+    """
+    Save a fitted pipeline to disk, optionally syncing to cloud.
+
+    If config is provided with storage.backend == "s3", will also
+    upload the model to S3 after saving locally.
+
+    Args:
+        pipeline: The fitted sklearn pipeline to save.
+        model_path: Where to save locally (e.g., "models/baseline.pkl").
+        config: Optional pipeline config dict for cloud storage.
+
+    Returns:
+        The local path where the model was saved.
+    """
+    storage_manager = StorageManager(config)
+    storage_manager.save(pipeline, model_path)
     return model_path
 
 

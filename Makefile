@@ -18,13 +18,16 @@ PYTHON := $(shell [ -f .venv/bin/python ] && echo ".venv/bin/python" || echo "py
 PIP    := $(shell [ -f .venv/bin/pip ] && echo ".venv/bin/pip" || echo "pip")
 RUFF   := $(shell [ -f .venv/bin/ruff ] && echo ".venv/bin/ruff" || echo "ruff")
 
-.PHONY: install test train smoke-test format lint evaluate serve run-pipeline docker-build docker-up
+.PHONY: install test test-light train smoke-test format lint evaluate serve run-pipeline docker-build docker-up
 
 install:
 	$(PIP) install -e ".[dev]"
 
 test:
 	$(PYTHON) -m pytest tests/ -v
+
+test-light:
+	$(PYTHON) -m pytest tests/ -v -m "not slow"
 
 train:
 	$(PYTHON) scripts/train_model.py
@@ -45,7 +48,7 @@ serve:
 	$(PYTHON) -m uvicorn genomics_ml.api.main:app --reload --port 8000
 
 run-pipeline:
-	@echo "TODO: implement run-pipeline target"
+	$(PYTHON) scripts/run_pipeline.py
 
 docker-build:
 	docker build -t genomics-ml-api .

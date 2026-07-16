@@ -28,7 +28,12 @@ def init_database(db_path: str) -> sqlite3.Connection:
     connection = sqlite3.connect(db_path)
     with open("sql/create_tables.sql") as f:
         connection.executescript(f.read())
-    connection.commit()
+    # Migration: add is_champion column if upgrading from an older schema
+    try:
+        connection.execute("ALTER TABLE runs ADD COLUMN is_champion INTEGER NOT NULL DEFAULT 0")
+        connection.commit()
+    except sqlite3.OperationalError:
+        pass  # column already exists
     return connection
 
 
@@ -169,6 +174,32 @@ def get_best_run(conn: sqlite3.Connection) -> Optional[Dict]:
         FROM runs r
         JOIN metrics m ON m.run_id = r.id
         WHERE m.metric_name = 'accuracy'
+        ORDER BY m.metric_value DESC
+        LIMIT 1
+    """)
+    row = cur.fetchone()
+    if row is None:
+        return None
+    return {
+        "run_id": row[0],
+        "run_name": row[1],
+        "model_name": row[2],
+        "timestamp": row[3],
+        "accuracy": row[4],
+    }
+
+
+def get_champion(conn: sqlite3.Connection) -> Optional[Dict]:
+    """Retrieve the currently promoted champion run.
+
+    Returns a dict with keys: run_id, run_name, model_name, timestamp, accuracy
+    or None if no champion exists.
+    """
+    cur = conn.execute("""
+        SELECT r.id, r.run_name, r.model_name, r.timestamp, m.metric_value AS accuracy
+        FROM runs r
+        JOIN metrics m ON m.run_id = r.id
+        WHERE m.metric_name = 'accuracy' AND r.is_champion = 1
         ORDER BY m.metric_value DESC
         LIMIT 1
     """)

@@ -175,5 +175,6 @@ def train_model(
         "accuracy": accuracy,
         "classification_report": report_text,
         "model_path": model_path,
+        "run_id": run_id,
     }
     return metrics, pipeline

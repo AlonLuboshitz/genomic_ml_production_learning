@@ -28,3 +28,7 @@ validation:
 logging:
   level: "INFO"
   file: "logs/pipeline.log"
+
+storage:
+  backend: "local"                # "local" or "s3"
+  bucket: "genomics-ml-artifacts" # S3 bucket name (used only when backend is "s3")

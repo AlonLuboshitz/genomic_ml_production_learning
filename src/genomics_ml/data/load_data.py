@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 from genomics_ml.utils.config import load_config, get_config_path
@@ -7,6 +7,7 @@ from genomics_ml.data.validation import validate_dataframe
 
 
 def load_data(
+    config: Optional[Dict[str, Any]] = None,
     config_path: Optional[str] = None,
     run_validation: bool = True,
 ) -> Tuple[pd.DataFrame, pd.Series]:
@@ -14,8 +15,11 @@ def load_data(
 
     Parameters
     ----------
+    config : dict, optional
+        Pre-loaded config dict. If provided, ``config_path`` is ignored.
     config_path : str, optional
-        Path to config YAML. Defaults to project config.
+        Path to config YAML. Only used if ``config`` is None.
+        Defaults to project config if both are None.
     run_validation : bool
         Whether to run data validation after loading (default True).
 
@@ -37,10 +41,11 @@ def load_data(
     """
     logger = get_logger("genomics_ml.data")
 
-    if config_path is None:
-        config_path = get_config_path()
+    if config is None:
+        if config_path is None:
+            config_path = get_config_path()
+        config = load_config(config_path)
 
-    config = load_config(config_path)
     raw_path = config["data"]["raw_path"]
 
     logger.info("Loading data from %s", raw_path)
