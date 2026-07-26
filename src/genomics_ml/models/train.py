@@ -26,19 +26,20 @@ Run the training with:
     python scripts/train_model.py
 """
 
-from typing import Any, Dict, Optional, Tuple
+from __future__ import annotations
 
+from typing import Any
+
+import mlflow
 import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
 
 from genomics_ml.features.preprocessing import build_preprocessing_pipeline
 from genomics_ml.models.model_utils import save_model
-import mlflow
-from genomics_ml.utils.config import load_config, get_config_path
-from genomics_ml.utils.logging import get_logger
+from genomics_ml.utils.config import get_config_path, load_config
 from genomics_ml.utils.database import (
     close_connection,
     init_database,
@@ -47,11 +48,12 @@ from genomics_ml.utils.database import (
     insert_predictions,
     insert_run,
 )
+from genomics_ml.utils.logging import get_logger
 
 logger = get_logger("genomics_ml.models.train")
 
 
-def _get_classifier(config: Dict[str, Any]):
+def _get_classifier(config: dict[str, Any]):
     """TODO: Instantiate the classifier class from config['model'].
 
     Steps:
@@ -92,11 +94,11 @@ def _get_model_configs(config):
 def train_model(
     X: pd.DataFrame,
     y: pd.Series,
-    config: Optional[Dict[str, Any]] = None,
-    model_path: Optional[str] = None,
-    experiment_name: Optional[str] = None,
-    run_name: Optional[str] = None,
-) -> Tuple[Dict[str, Any], Any]:
+    config: dict[str, Any] | None = None,
+    model_path: str | None = None,
+    experiment_name: str | None = None,
+    run_name: str | None = None,
+) -> tuple[dict[str, Any], Any]:
     """Train a classifier, log to MLflow + SQLite, return metrics and pipeline."""
     if config is None:
         config = load_config(get_config_path())
@@ -141,9 +143,9 @@ def train_model(
         # ── Save model ────────────────────────────────────────
         if model_path is None:
             model_type, _ = _get_model_configs(config)
-            from datetime import datetime
+            from datetime import datetime, timezone
 
-            date_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+            date_str = datetime.now(tz=timezone.utc).strftime("%Y%m%d_%H%M%S")
             model_path = f"models/{model_type}_{date_str}.pkl"
 
         save_model(pipeline, model_path)

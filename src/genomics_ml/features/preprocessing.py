@@ -7,7 +7,9 @@ Provides:
   - build_preprocessing_pipeline: compose both into a single Pipeline
 """
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 
 import pandas as pd
 from sklearn.impute import SimpleImputer
@@ -106,7 +108,7 @@ def scale_features(
 
 
 def build_preprocessing_pipeline(
-    config: Optional[Dict[str, Any]] = None,
+    config: dict[str, Any] | None = None,
 ) -> Pipeline:
     """Build a sklearn Pipeline that imputes then scales.
 

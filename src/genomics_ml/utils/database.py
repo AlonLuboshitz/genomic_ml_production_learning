@@ -11,8 +11,10 @@ Usage:
     run_id = insert_run(conn, model_name="RandomForest", run_name="rf-v1")
 """
 
+from __future__ import annotations
+
 import sqlite3
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 def init_database(db_path: str) -> sqlite3.Connection:
@@ -44,12 +46,12 @@ def insert_run(
     model_name: str,
     run_name: str,
     status: str = "running",
-    dataset_path: Optional[str] = None,
-    test_size: Optional[float] = None,
-    random_state: Optional[int] = None,
-    training_rows: Optional[int] = None,
-    testing_rows: Optional[int] = None,
-    num_features: Optional[int] = None,
+    dataset_path: str | None = None,
+    test_size: float | None = None,
+    random_state: int | None = None,
+    training_rows: int | None = None,
+    testing_rows: int | None = None,
+    num_features: int | None = None,
 ) -> int:
     """Insert a new run and return its ID."""
     cursor = conn.execute(
@@ -76,7 +78,7 @@ def insert_run(
     return last_id
 
 
-def insert_params(conn: sqlite3.Connection, run_id: int, params: Dict[str, Any]):
+def insert_params(conn: sqlite3.Connection, run_id: int, params: dict[str, Any]):
     """TODO: Insert model parameters as key-value pairs.
 
     Steps:
@@ -93,7 +95,7 @@ def insert_params(conn: sqlite3.Connection, run_id: int, params: Dict[str, Any])
     conn.commit()
 
 
-def insert_metrics(conn: sqlite3.Connection, run_id: int, metrics: Dict[str, float]):
+def insert_metrics(conn: sqlite3.Connection, run_id: int, metrics: dict[str, float]):
     """TODO: Insert evaluation metrics.
 
     Steps:
@@ -114,9 +116,9 @@ def insert_predictions(
     conn: sqlite3.Connection,
     run_id: int,
     split: str,
-    y_pred: List[int],
-    y_true: Optional[List[int]] = None,
-    probabilities: Optional[List[float]] = None,
+    y_pred: list[int],
+    y_true: list[int] | None = None,
+    probabilities: list[float] | None = None,
 ):
     """TODO: Store predictions for a run.
 
@@ -158,7 +160,7 @@ def insert_predictions(
     conn.commit()
 
 
-def get_best_run(conn: sqlite3.Connection) -> Optional[Dict]:
+def get_best_run(conn: sqlite3.Connection) -> dict | None:
     """TODO: Retrieve the run with the highest accuracy.
 
     Returns a dict with keys: run_id, run_name, model_name, timestamp, accuracy
@@ -191,7 +193,7 @@ def get_best_run(conn: sqlite3.Connection) -> Optional[Dict]:
     }
 
 
-def get_champion(conn: sqlite3.Connection) -> Optional[Dict]:
+def get_champion(conn: sqlite3.Connection) -> dict | None:
     """Retrieve the currently promoted champion run.
 
     Returns a dict with keys: run_id, run_name, model_name, timestamp, accuracy

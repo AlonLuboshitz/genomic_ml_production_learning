@@ -10,8 +10,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from genomics_ml.models.train import train_model, _get_classifier
-
+from genomics_ml.models.train import _get_classifier, train_model
 
 # ── Fixture: tiny synthetic dataset ──────────────────────────
 

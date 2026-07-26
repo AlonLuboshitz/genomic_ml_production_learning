@@ -5,7 +5,7 @@ Usage:
     python -m genomics_ml.orchestration.prefect_flow
 """
 
-from typing import Optional
+from __future__ import annotations
 
 from prefect import flow, task
 
@@ -13,7 +13,7 @@ from genomics_ml.data.load_data import load_data
 from genomics_ml.models.promote import promote_if_better
 from genomics_ml.models.train import train_model
 from genomics_ml.utils.cli import override_config
-from genomics_ml.utils.config import load_config, get_config_path
+from genomics_ml.utils.config import get_config_path, load_config
 from genomics_ml.utils.logging import get_logger
 
 logger = get_logger("genomics_ml.orchestration")
@@ -29,7 +29,7 @@ def load_data_task(config: dict):
 
 @task
 def train_model_task(
-    X, y, config: dict, experiment_name: str = None, run_name: str = None
+    X, y, config: dict, experiment_name: str | None = None, run_name: str | None = None
 ):
     """Train, evaluate, save model, log to MLflow + SQLite."""
     kwargs = {}
@@ -37,18 +37,18 @@ def train_model_task(
         kwargs["experiment_name"] = experiment_name
     if run_name:
         kwargs["run_name"] = run_name
-    metrics, pipeline = train_model(X, y, config=config, **kwargs)
+    metrics, _pipeline = train_model(X, y, config=config, **kwargs)
     logger.info("Training complete - accuracy: %.4f", metrics["accuracy"])
     return metrics
 
 
 @flow(log_prints=True)
 def training_pipeline(
-    config_path: Optional[str] = None,
-    model_type: Optional[str] = None,
-    model_params: Optional[str] = None,
-    experiment_name: Optional[str] = None,
-    run_name: Optional[str] = None,
+    config_path: str | None = None,
+    model_type: str | None = None,
+    model_params: str | None = None,
+    experiment_name: str | None = None,
+    run_name: str | None = None,
 ):
     """Orchestrate the full ML pipeline: load data -> train -> evaluate -> log."""
     if config_path is None:

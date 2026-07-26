@@ -20,7 +20,6 @@ import pytest
 
 from genomics_ml.models.promote import promote_if_better
 
-
 # ── Fixtures ────────────────────────────────────────────────────────────
 
 

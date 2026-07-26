@@ -5,17 +5,19 @@ Reads logging config (level, file path) from the project's YAML config
 and returns a configured logger with console + file handlers.
 """
 
+from __future__ import annotations
+
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
-from genomics_ml.utils.config import load_config, get_config_path
+
+from genomics_ml.utils.config import get_config_path, load_config
 
 
 def setup_logger(
     name: str = "genomics_ml",
     level: str = "INFO",
-    log_file: Optional[str] = "logs/pipeline.log",
+    log_file: str | None = "logs/pipeline.log",
 ) -> logging.Logger:
     """TODO: Configure and return a logger with console and file handlers.
 

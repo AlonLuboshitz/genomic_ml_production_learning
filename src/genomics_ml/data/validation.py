@@ -11,9 +11,12 @@ Runs configurable checks on a raw DataFrame before preprocessing:
 Each check returns a (passed: bool, message: str) pair.
 """
 
-from typing import Any, Dict, List, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import pandas as pd
+
 from genomics_ml.utils.logging import get_logger
 
 logger = get_logger("genomics_ml.data.validation")
@@ -21,8 +24,8 @@ logger = get_logger("genomics_ml.data.validation")
 
 def _check_schema(
     df: pd.DataFrame,
-    schema: Optional[Dict[str, str]] = None,
-) -> List[Tuple[bool, str]]:
+    schema: dict[str, str] | None = None,
+) -> list[tuple[bool, str]]:
     """Verify expected columns exist and have the correct dtype.
 
     Parameters
@@ -38,7 +41,7 @@ def _check_schema(
     list of (bool, str)
         One entry per column in the schema.
     """
-    results: List[Tuple[bool, str]] = []
+    results: list[tuple[bool, str]] = []
     if schema is None:
         results.append((True, "Schema check skipped (no schema defined in config)"))
         return results
@@ -63,8 +66,8 @@ def _check_schema(
 def _check_missing_values(
     df: pd.DataFrame,
     max_missing_frac: float = 0.5,
-    columns: Optional[List[str]] = None,
-) -> List[Tuple[bool, str]]:
+    columns: list[str] | None = None,
+) -> list[tuple[bool, str]]:
     """Check that missing-value fraction is below a threshold.
 
     Parameters
@@ -79,7 +82,7 @@ def _check_missing_values(
     -------
     list of (bool, str)
     """
-    results: List[Tuple[bool, str]] = []
+    results: list[tuple[bool, str]] = []
     if columns is None:
         columns = list(df.columns)
 
@@ -89,8 +92,10 @@ def _check_missing_values(
             results.append(
                 (
                     False,
-                    f"Column '{col}' has {missing_frac:.1%} missing "
-                    f"(threshold: {max_missing_frac:.0%})",
+                    (
+                        f"Column '{col}' has {missing_frac:.1%} missing "
+                        f"(threshold: {max_missing_frac:.0%})"
+                    ),
                 )
             )
         else:
@@ -100,8 +105,8 @@ def _check_missing_values(
 
 def _check_value_ranges(
     df: pd.DataFrame,
-    ranges: Optional[Dict[str, Tuple[float, float]]] = None,
-) -> List[Tuple[bool, str]]:
+    ranges: dict[str, tuple[float, float]] | None = None,
+) -> list[tuple[bool, str]]:
     """Verify numeric columns stay within expected [low, high] bounds.
 
     Parameters
@@ -114,7 +119,7 @@ def _check_value_ranges(
     -------
     list of (bool, str)
     """
-    results: List[Tuple[bool, str]] = []
+    results: list[tuple[bool, str]] = []
     if ranges is None:
         results.append((True, "Range check skipped (no ranges defined in config)"))
         return results
@@ -134,8 +139,10 @@ def _check_value_ranges(
             results.append(
                 (
                     False,
-                    f"Column '{col}' out of range [{lo}, {hi}] "
-                    f"(actual min={col_min}, max={col_max})",
+                    (
+                        f"Column '{col}' out of range [{lo}, {hi}] "
+                        f"(actual min={col_min}, max={col_max})"
+                    ),
                 )
             )
         else:
@@ -146,7 +153,7 @@ def _check_value_ranges(
 def _check_target_balance(
     y: pd.Series,
     min_class_frac: float = 0.05,
-) -> List[Tuple[bool, str]]:
+) -> list[tuple[bool, str]]:
     """Warn if any class has very few samples.
 
     Parameters
@@ -160,15 +167,17 @@ def _check_target_balance(
     -------
     list of (bool, str)
     """
-    results: List[Tuple[bool, str]] = []
+    results: list[tuple[bool, str]] = []
     counts = y.value_counts(normalize=True)
     for cls, frac in counts.items():
         if frac < min_class_frac:
             results.append(
                 (
                     False,
-                    f"Class '{cls}' has only {frac:.1%} of samples "
-                    f"(threshold: {min_class_frac:.0%})",
+                    (
+                        f"Class '{cls}' has only {frac:.1%} of samples "
+                        f"(threshold: {min_class_frac:.0%})"
+                    ),
                 )
             )
     if not results:
@@ -176,7 +185,7 @@ def _check_target_balance(
     return results
 
 
-def _check_duplicates(df: pd.DataFrame) -> List[Tuple[bool, str]]:
+def _check_duplicates(df: pd.DataFrame) -> list[tuple[bool, str]]:
     """Detect fully duplicate rows."""
     n_dupes = df.duplicated().sum()
     if n_dupes > 0:
@@ -187,8 +196,8 @@ def _check_duplicates(df: pd.DataFrame) -> List[Tuple[bool, str]]:
 def validate_dataframe(
     df: pd.DataFrame,
     target_column: str = "target",
-    config: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Run all configured validation checks on a DataFrame.
 
     Parameters
@@ -227,7 +236,7 @@ def validate_dataframe(
     val_config = (config or {}).get("validation", {})
 
     # Separate checks are accumulated into *all_results*
-    all_results: List[Dict[str, Any]] = []
+    all_results: list[dict[str, Any]] = []
 
     # 1. Schema
     schema = val_config.get("schema")

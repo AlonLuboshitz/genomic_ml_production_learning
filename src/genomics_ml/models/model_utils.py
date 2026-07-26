@@ -9,16 +9,19 @@ Cloud storage support:
     Without config, behavior is identical to the original local-only version.
 """
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 from sklearn.metrics import accuracy_score
+
 from genomics_ml.utils.storage import StorageManager
 
 # ── Load / Save ───────────────────────────────────────────────────────
 
 
-def load_model(model_path: str, config: Optional[dict] = None) -> Any:
+def load_model(model_path: str, config: dict | None = None) -> Any:
     """
     Load a fitted sklearn pipeline from disk.
 
@@ -40,7 +43,7 @@ def load_model(model_path: str, config: Optional[dict] = None) -> Any:
     return model
 
 
-def save_model(pipeline: Any, model_path: str, config: Optional[dict] = None) -> str:
+def save_model(pipeline: Any, model_path: str, config: dict | None = None) -> str:
     """
     Save a fitted pipeline to disk, optionally syncing to cloud.
 
@@ -98,10 +101,10 @@ def predict_proba(model: Any, X: np.ndarray) -> np.ndarray:
 
 
 def compare_models(
-    model_paths: List[str],
+    model_paths: list[str],
     X_test: np.ndarray,
     y_test: np.ndarray,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Load multiple models, score them, return ranking sorted by accuracy."""
     results = []
     for path in model_paths:

@@ -16,7 +16,7 @@ from genomics_ml.utils.cli import (
     override_config_from_args,
     train_kwargs_from_args,
 )
-from genomics_ml.utils.config import load_config, get_config_path
+from genomics_ml.utils.config import get_config_path, load_config
 from genomics_ml.utils.logging import get_logger
 
 logger = get_logger("scripts.train_model")
@@ -33,7 +33,7 @@ def main():
     X, y = load_data(config=config)
 
     kwargs = train_kwargs_from_args(args)
-    metrics, pipeline = train_model(X, y, config=config, **kwargs)
+    metrics, _pipeline = train_model(X, y, config=config, **kwargs)
 
     print(metrics)
     return 0

@@ -11,9 +11,13 @@ Requirements:
     - AWS credentials configured via ~/.aws/credentials or env vars
 """
 
+from __future__ import annotations
+
 import os
 from pathlib import Path
+
 import joblib
+
 from genomics_ml.utils.logging import get_logger
 
 logger = get_logger("genomics_ml.storage")
@@ -28,7 +32,7 @@ class CloudStorage:
     talks to S3 when told to.
     """
 
-    def __init__(self, bucket: str = None):
+    def __init__(self, bucket: str | None = None):
         """
         Initialize the S3 client.
 
@@ -59,7 +63,7 @@ class CloudStorage:
                 )
         return self.s3
 
-    def upload(self, local_path: str, s3_key: str = None) -> bool:
+    def upload(self, local_path: str, s3_key: str | None = None) -> bool:
         """
         Upload a local file to S3.
 
@@ -76,11 +80,11 @@ class CloudStorage:
             client.upload_file(local_path, self.bucket, s3_key)
             print(f"Uploaded {local_path} -> s3://{self.bucket}/{s3_key}")
             return True
-        except Exception as e:
+        except OSError as e:
             print(f"Upload failed: {e}")
             return False
 
-    def download(self, s3_key: str, local_path: str = None) -> bool:
+    def download(self, s3_key: str, local_path: str | None = None) -> bool:
         """
         Download a file from S3 to your local machine.
 
@@ -97,7 +101,7 @@ class CloudStorage:
             client.download_file(self.bucket, s3_key, local_path)
             print(f"Downloaded s3://{self.bucket}/{s3_key} -> {local_path}")
             return True
-        except Exception as e:
+        except OSError as e:
             print(f"Download failed: {e}")
             return False
 
@@ -115,7 +119,7 @@ class CloudStorage:
             client = self._get_client()
             resp = client.list_objects_v2(Bucket=self.bucket, Prefix=prefix)
             return [obj["Key"] for obj in resp.get("Contents", [])]
-        except Exception as e:
+        except OSError as e:
             print(f"List failed: {e}")
             return []
 
@@ -134,7 +138,7 @@ class StorageManager:
         model = storage.load("models/baseline.pkl")
     """
 
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict | None = None):
         """
         Initialize the storage manager from pipeline config.
 
@@ -189,9 +193,6 @@ class StorageManager:
                 self.cloud.download(Path(local_path).name, local_path)
             if not Path(local_path).exists():
                 raise RuntimeError("Couldnt download file from s3 cloud")
-        try:
-            model = joblib.load(local_path)
-            logger.info(f"Loaded model: {local_path}")
-        except Exception as e:
-            raise (e)
+        model = joblib.load(local_path)
+        logger.info(f"Loaded model: {local_path}")
         return model

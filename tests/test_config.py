@@ -15,8 +15,8 @@ Fixtures available:
 """
 
 import pytest
-from genomics_ml.utils.config import load_config, get_config_path
 
+from genomics_ml.utils.config import get_config_path, load_config
 
 # ── Fixture: temporary valid YAML file ───────────────────────
 

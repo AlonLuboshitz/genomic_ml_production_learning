@@ -1,16 +1,19 @@
-from typing import Any, Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import pandas as pd
-from genomics_ml.utils.config import load_config, get_config_path
-from genomics_ml.utils.logging import get_logger
+
 from genomics_ml.data.validation import validate_dataframe
+from genomics_ml.utils.config import get_config_path, load_config
+from genomics_ml.utils.logging import get_logger
 
 
 def load_data(
-    config: Optional[Dict[str, Any]] = None,
-    config_path: Optional[str] = None,
+    config: dict[str, Any] | None = None,
+    config_path: str | None = None,
     run_validation: bool = True,
-) -> Tuple[pd.DataFrame, pd.Series]:
+) -> tuple[pd.DataFrame, pd.Series]:
     """Load genomic CSV, split into feature matrix X and target vector y.
 
     Parameters

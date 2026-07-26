@@ -7,6 +7,7 @@
 #   make smoke-test — quick end-to-end check
 #   make format     — format code with ruff
 #   make lint       — lint with ruff
+#   make fix        — auto-fix lint and format issues
 #   make evaluate   — evaluate a trained model
 #   make serve      — run the FastAPI server
 #   make run-pipeline — run the full Prefect pipeline
@@ -18,7 +19,7 @@ PYTHON := $(shell [ -f .venv/bin/python ] && echo ".venv/bin/python" || echo "py
 PIP    := $(shell [ -f .venv/bin/pip ] && echo ".venv/bin/pip" || echo "pip")
 RUFF   := $(shell [ -f .venv/bin/ruff ] && echo ".venv/bin/ruff" || echo "ruff")
 
-.PHONY: install test test-light train smoke-test format lint evaluate serve run-pipeline docker-build docker-up
+.PHONY: install test test-light train smoke-test format lint fix evaluate serve run-pipeline docker-build docker-up
 
 install:
 	$(PIP) install -e ".[dev]"
@@ -40,6 +41,10 @@ format:
 
 lint:
 	$(RUFF) check src/ tests/ scripts/
+
+fix:
+	$(RUFF) check --fix --unsafe-fixes src/ tests/ scripts/
+	$(RUFF) format src/ tests/ scripts/
 
 evaluate:
 	$(PYTHON) scripts/evaluate_model.py

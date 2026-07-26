@@ -16,7 +16,6 @@ from genomics_ml.features.preprocessing import (
     scale_features,
 )
 
-
 # ── Fixture: sample data with NaN ────────────────────────────
 
 

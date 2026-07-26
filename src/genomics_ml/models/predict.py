@@ -12,4 +12,4 @@ from genomics_ml.models.model_utils import (
     predict_proba,
 )
 
-__all__ = ["load_model", "predict", "predict_proba", "compare_models"]
+__all__ = ["compare_models", "load_model", "predict", "predict_proba"]

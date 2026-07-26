@@ -11,10 +11,11 @@ Usage:
     )
 """
 
+from __future__ import annotations
+
 import shutil
 import sqlite3
 from pathlib import Path
-from typing import Optional
 
 from genomics_ml.utils.database import get_champion
 from genomics_ml.utils.logging import get_logger
@@ -88,7 +89,7 @@ def _do_promote(model_path: str, run_id: int, conn: sqlite3.Connection):
     logger.info("Run %d promoted to champion", run_id)
 
 
-def get_champion_path() -> Optional[str]:
+def get_champion_path() -> str | None:
     """Return the path to the champion model if it exists, else None."""
     path = Path(CHAMPION_PATH)
     return str(path) if path.exists() else None

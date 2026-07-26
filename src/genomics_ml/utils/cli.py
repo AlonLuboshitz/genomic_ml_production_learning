@@ -1,8 +1,10 @@
 """Shared CLI argument parser and config override logic for pipeline scripts."""
 
+from __future__ import annotations
+
 import argparse
 import json
-from typing import Any, Dict
+from typing import Any
 
 
 def build_common_parser(description: str) -> argparse.ArgumentParser:
@@ -23,9 +25,9 @@ def build_common_parser(description: str) -> argparse.ArgumentParser:
 
 
 def override_config_from_args(
-    config: Dict[str, Any],
+    config: dict[str, Any],
     args,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Apply CLI argument overrides to a config dict (mutates and returns it).
 
     Accepts an argparse Namespace or any object with ``.model_type``
@@ -55,10 +57,10 @@ _DEFAULT_PARAMS = {
 
 
 def override_config(
-    config: Dict[str, Any],
-    model_type: str = None,
-    model_params: str = None,
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+    model_type: str | None = None,
+    model_params: str | None = None,
+) -> dict[str, Any]:
     """Apply model overrides to a config dict (mutates and returns it).
 
     This lower-level function works with raw values so it can be called
@@ -77,7 +79,7 @@ def override_config(
     return config
 
 
-def train_kwargs_from_args(args) -> Dict[str, Any]:
+def train_kwargs_from_args(args) -> dict[str, Any]:
     """Return extra keyword arguments for train_model() from parsed args."""
     kwargs = {}
     if getattr(args, "experiment_name", None):

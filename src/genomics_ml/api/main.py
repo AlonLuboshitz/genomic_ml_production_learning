@@ -23,17 +23,17 @@ See teaching_examples/example_fastapi_service.py for reference.
 
 from importlib.metadata import version
 
+import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-import numpy as np
 
 # Reuse central model utilities instead of calling joblib directly
 from genomics_ml.models.model_utils import (
+    get_model_type,
+    get_n_features,
     load_model,
     predict,
     predict_proba,
-    get_model_type,
-    get_n_features,
 )
 from genomics_ml.utils.config import get_config_path, load_config
 
@@ -52,7 +52,7 @@ try:
     MODEL_TYPE = get_model_type(model)
     # Number of features expected (from the scaler)
     N_FEATURES = get_n_features(model)
-except Exception as e:
+except (OSError, ValueError) as e:
     model = None
     MODEL_TYPE = "unknown"
     N_FEATURES = 0
@@ -129,5 +129,5 @@ def predict_(req: PredictRequest):
             prediction=int(pred[0]),
             probability=round(float(proba[0][1]), 4),
         )
-    except Exception as e:
+    except (OSError, ValueError) as e:
         raise HTTPException(status_code=500, detail=str(e))
