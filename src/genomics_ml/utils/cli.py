@@ -8,7 +8,9 @@ from typing import Any, Dict
 def build_common_parser(description: str) -> argparse.ArgumentParser:
     """Return an ArgumentParser with arguments shared across all pipeline scripts."""
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("--config", dest="config_path", default=None, help="Path to config YAML")
+    parser.add_argument(
+        "--config", dest="config_path", default=None, help="Path to config YAML"
+    )
     parser.add_argument("--model-type", default=None, help="Override model type")
     parser.add_argument(
         "--model-params", default=None, help="Override model params as JSON"
@@ -38,9 +40,17 @@ def override_config_from_args(
 
 # Default params per model type (used when switching types without providing new params)
 _DEFAULT_PARAMS = {
-    "RandomForestClassifier": {"n_estimators": 100, "max_depth": 10, "random_state": 42},
+    "RandomForestClassifier": {
+        "n_estimators": 100,
+        "max_depth": 10,
+        "random_state": 42,
+    },
     "LogisticRegression": {"C": 1.0, "max_iter": 1000, "random_state": 42},
-    "GradientBoostingClassifier": {"n_estimators": 100, "learning_rate": 0.1, "random_state": 42},
+    "GradientBoostingClassifier": {
+        "n_estimators": 100,
+        "learning_rate": 0.1,
+        "random_state": 42,
+    },
 }
 
 

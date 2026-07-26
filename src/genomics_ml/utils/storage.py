@@ -15,7 +15,9 @@ import os
 from pathlib import Path
 import joblib
 from genomics_ml.utils.logging import get_logger
+
 logger = get_logger("genomics_ml.storage")
+
 
 class CloudStorage:
     """
@@ -25,25 +27,27 @@ class CloudStorage:
     This class doesn't know about configs or toggles — it just
     talks to S3 when told to.
     """
-    def __init__(self, bucket: str = None):
-            """
-            Initialize the S3 client.
 
-            Args:
-                bucket: S3 bucket name. Falls back to S3_BUCKET env var,
-                        then defaults to "genomics-ml-artifacts".
-            """
-            self.bucket = bucket or os.getenv("S3_BUCKET", "genomics-ml-artifacts")
-            # boto3.client creates a connection to AWS S3
-            # Credentials come from ~/.aws/credentials or environment variables
-            self.s3 = None  # lazy-loaded to avoid errors if boto3 isn't installed
-            self._initialized = False
-    
+    def __init__(self, bucket: str = None):
+        """
+        Initialize the S3 client.
+
+        Args:
+            bucket: S3 bucket name. Falls back to S3_BUCKET env var,
+                    then defaults to "genomics-ml-artifacts".
+        """
+        self.bucket = bucket or os.getenv("S3_BUCKET", "genomics-ml-artifacts")
+        # boto3.client creates a connection to AWS S3
+        # Credentials come from ~/.aws/credentials or environment variables
+        self.s3 = None  # lazy-loaded to avoid errors if boto3 isn't installed
+        self._initialized = False
+
     def _get_client(self):
         """Lazily create the S3 client (only when actually needed)."""
         if not self._initialized:
             try:
                 import boto3
+
                 self.s3 = boto3.client("s3")
                 self.s3.head_bucket(Bucket=self.bucket)
                 print(f"Connected to S3 bucket: {self.bucket}")
@@ -55,7 +59,6 @@ class CloudStorage:
                 )
         return self.s3
 
-    
     def upload(self, local_path: str, s3_key: str = None) -> bool:
         """
         Upload a local file to S3.
@@ -116,8 +119,6 @@ class CloudStorage:
             print(f"List failed: {e}")
             return []
 
-    
-        
 
 class StorageManager:
     """
@@ -147,7 +148,6 @@ class StorageManager:
         bucket = config.get("storage", {}).get("bucket", "genomics-ml-artifacts")
         if backend.lower() == "s3":
             self.cloud = CloudStorage(bucket)
-        
 
     def save(self, model, local_path: str) -> None:
         """
@@ -163,7 +163,6 @@ class StorageManager:
         joblib.dump(model, local_path)
         if self.cloud:
             self.cloud.upload(local_path)
-       
 
     def load(self, local_path: str):
         """
@@ -180,16 +179,19 @@ class StorageManager:
         """
         if not Path(local_path).exists():
             if self.cloud is None:
-                raise RuntimeError(f"No model in local path: {local_path} AND NO CLOUD USAGE")
+                raise RuntimeError(
+                    f"No model in local path: {local_path} AND NO CLOUD USAGE"
+                )
             else:
-                logger.info(f"model: {local_path} not found locally, downloading from S3...")
+                logger.info(
+                    f"model: {local_path} not found locally, downloading from S3..."
+                )
                 self.cloud.download(Path(local_path).name, local_path)
             if not Path(local_path).exists():
-                raise RuntimeError("Couldnt download file from s3 cloud") 
+                raise RuntimeError("Couldnt download file from s3 cloud")
         try:
             model = joblib.load(local_path)
             logger.info(f"Loaded model: {local_path}")
         except Exception as e:
-            raise(e)
+            raise (e)
         return model
-        

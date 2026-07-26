@@ -30,7 +30,9 @@ def init_database(db_path: str) -> sqlite3.Connection:
         connection.executescript(f.read())
     # Migration: add is_champion column if upgrading from an older schema
     try:
-        connection.execute("ALTER TABLE runs ADD COLUMN is_champion INTEGER NOT NULL DEFAULT 0")
+        connection.execute(
+            "ALTER TABLE runs ADD COLUMN is_champion INTEGER NOT NULL DEFAULT 0"
+        )
         connection.commit()
     except sqlite3.OperationalError:
         pass  # column already exists

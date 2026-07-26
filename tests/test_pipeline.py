@@ -23,6 +23,7 @@ from genomics_ml.models.promote import promote_if_better
 
 # ── Fixtures ────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def tmp_db():
     """Create a temporary SQLite database with the runs + metrics tables."""
@@ -73,6 +74,7 @@ def tmp_db_with_champion(tmp_db):
 
 
 # ── Promotion tests (fast, no model training) ──────────────────────────
+
 
 def test_promote_when_no_champion(tmp_db):
     """No champion exists → new model should be promoted."""
@@ -138,9 +140,7 @@ def test_promote_when_better(tmp_db_with_champion):
 
     # New run should be champion
     conn = sqlite3.connect(tmp_db_with_champion)
-    cur = conn.execute(
-        "SELECT id, is_champion FROM runs WHERE is_champion = 1"
-    )
+    cur = conn.execute("SELECT id, is_champion FROM runs WHERE is_champion = 1")
     champion_row = cur.fetchone()
     assert champion_row is not None, "A champion should exist"
     assert champion_row[0] == 2, "Run 2 should be the new champion"
@@ -198,6 +198,7 @@ def test_promote_when_worse(tmp_db_with_champion, tmp_path):
 
 
 # ── Flow tests (slow — train real models) ──────────────────────────────
+
 
 @pytest.mark.slow
 def test_flow_returns_metrics():

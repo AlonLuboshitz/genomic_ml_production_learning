@@ -28,7 +28,9 @@ def load_data_task(config: dict):
 
 
 @task
-def train_model_task(X, y, config: dict, experiment_name: str = None, run_name: str = None):
+def train_model_task(
+    X, y, config: dict, experiment_name: str = None, run_name: str = None
+):
     """Train, evaluate, save model, log to MLflow + SQLite."""
     kwargs = {}
     if experiment_name:
@@ -61,7 +63,8 @@ def training_pipeline(
     # Run pipeline steps
     X, y = load_data_task(config)
     metrics = train_model_task(
-        X, y,
+        X,
+        y,
         config=config,
         experiment_name=experiment_name,
         run_name=run_name,
