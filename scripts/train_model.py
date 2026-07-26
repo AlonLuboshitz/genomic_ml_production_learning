@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 CLI entrypoint for training the baseline model.
 

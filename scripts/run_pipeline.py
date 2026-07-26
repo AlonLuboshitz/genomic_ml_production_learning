@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 CLI entry point to run the Prefect training pipeline.
 

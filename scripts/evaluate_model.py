@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Evaluate a trained model on test data and print metrics.
 
